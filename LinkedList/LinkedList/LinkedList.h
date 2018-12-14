@@ -120,7 +120,7 @@ void LinkedList<T>::setData(int index, T data)
 template <typename T>
 void LinkedList<T>::clear()
 {
-	if (mCount <= 0)
+	if (mCount == 0)
 		return;
 
 	Node<T> *traversalNode = mHead;
@@ -145,13 +145,23 @@ void LinkedList<T>::clear()
 template <typename T>
 void LinkedList<T>::display()
 {
-	if (mCount <= 0)
+	if (mCount == 0)
 		return;
 
 	Node<T> *traversalNode = mHead;
 
-	for (int i = 0; i < mCount; i++)
+	if (mHead == NULL)
+	{
+		std::cout << "Empty list\n";
+		return;
+	}
+
+	while (traversalNode != NULL)
+	{
 		std::cout << traversalNode->mData << " ";
+		traversalNode = traversalNode->mNext;
+	}
+		
 	std::cout << std::endl;
 }
 
@@ -161,52 +171,51 @@ bool LinkedList<T>::insert(T data)
 	Node<T> *traversalNode = mHead, *oneBefore, *newNode;
 
 	newNode = new Node<T>(data);
+
 	if (newNode == NULL)
 		return false;
 
 	//Case 1 -- Empty List
 	if (mHead == NULL)
 	{
-		newNode->mData = data;
 		mHead = newNode;
 		mTail = newNode;
 	}
-
-	//Case 2 -- Insert at front
-	if (data > mHead->Data)
+	else
 	{
-		newNode->mNext = mHead;
-		newNode->mData = data;
-		mHead = newNode;
-	}
-
-	//Case 3 -- Insert in middle
-	if (data < mHead->mData && data > mTail->mData)
-	{
-		for (int i = 0; i < mCount; i++)
+		//Case 2 -- Insert at front
+		if (data < mHead->mData)
+		{
+			newNode->mNext = mHead;
+			mHead = newNode;
+		}
+		else if (data >= mTail->mData) //Case 3 -- Insert at end
+		{
+			mTail->mNext = newNode;
+			mTail = newNode;
+		}
+		else //Case 4 -- Insert in middle
 		{
 			oneBefore = traversalNode;
 			traversalNode = traversalNode->mNext;
-			if (data > traversalNode->mData)
-			{
-				newNode = traversalNode;
-				newNode->mNext = traversalNode->mNext;
-				newNode->mData = data;
-				oneBefore->mNext = NULL;
-				oneBefore->mNext = newNode;
 
-				break;
+			while (traversalNode->mData < data)
+			{
+				oneBefore = traversalNode;
+				traversalNode = traversalNode->mNext;
+			}
+
+			if(traversalNode->mData != data)
+			{
+				newNode->mNext = traversalNode;
+				oneBefore->mNext = newNode;
+			}
+			else
+			{
+				delete newNode;
+				return false;
 			}
 		}
-	}
-	
-	//Case 4 -- Insert at end
-	if (data < mTail->mData)
-	{
-		mTail->mNext = newNode;
-		newNode->mNext = NULL;
-		newNode->mData = data;
-		mTail = newNode;
 	}
 
 	mCount++;
@@ -214,4 +223,51 @@ bool LinkedList<T>::insert(T data)
 }
 
 
+template <typename T>
+bool LinkedList<T>::isEmpty()
+{
+	return mCount == 0;
+}
+
+
+template <typename T>
+bool LinkedList<T>::isExist(T searchKey)
+{
+	if (mCount == 0)
+		return;
+
+	Node<T> *traversalNode = mHead;
+	bool found = false;
+
+	for (int i = 0; i < mCount; i++)
+	{
+		if (traversalNode->mData == searchKey)
+			found = true;
+
+		traversalNode = traversalNode->mNext;
+	}
+	return found;
+}
+
+
+template <typename T>
+bool LinkedList<T>::remove(T searchKey)
+{
+	if (mCount == 0)
+		return;
+
+	Node<T> *traversalNode = mHead;
+
+	for (int i = 0; i < mCount; i++)
+	{
+		if (traversalNode->mData == searchKey)
+		{
+			delete traversalNode;
+			return true;
+		}
+
+		traversalNode = traversalNode->mNext;
+	}
+	return false;
+}
 #endif // LINKEDLIST_H
