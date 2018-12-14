@@ -158,7 +158,7 @@ void LinkedList<T>::display()
 template <typename T>
 bool LinkedList<T>::insert(T data)
 {
-	Node<T> *tmp, *oneBefore, *newNode;
+	Node<T> *traversalNode = mHead, *oneBefore, *newNode;
 
 	newNode = new Node<T>(data);
 	if (newNode == NULL)
@@ -183,7 +183,35 @@ bool LinkedList<T>::insert(T data)
 	//Case 3 -- Insert in middle
 	if (data < mHead->mData && data > mTail->mData)
 	{
-		
+		for (int i = 0; i < mCount; i++)
+		{
+			oneBefore = traversalNode;
+			traversalNode = traversalNode->mNext;
+			if (data > traversalNode->mData)
+			{
+				newNode = traversalNode;
+				newNode->mNext = traversalNode->mNext;
+				newNode->mData = data;
+				oneBefore->mNext = NULL;
+				oneBefore->mNext = newNode;
+
+				break;
+			}
+		}
 	}
+	
+	//Case 4 -- Insert at end
+	if (data < mTail->mData)
+	{
+		mTail->mNext = newNode;
+		newNode->mNext = NULL;
+		newNode->mData = data;
+		mTail = newNode;
+	}
+
+	mCount++;
+	return true;
 }
+
+
 #endif // LINKEDLIST_H
